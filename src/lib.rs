@@ -44,9 +44,11 @@ impl TrustLedger {
     }
 
     pub fn score(&self, subject: &str) -> i64 {
-        self.events.iter().filter(|e| e.subject == subject).map(|e| {
-            if e.accepted { 1 } else { -1 }
-        }).sum()
+        self.events
+            .iter()
+            .filter(|e| e.subject == subject)
+            .map(|e| if e.accepted { 1 } else { -1 })
+            .sum()
     }
 
     pub fn scores(&self) -> BTreeMap<String, i64> {
@@ -84,7 +86,10 @@ mod tests {
     fn rejects_replays() {
         let mut ledger = TrustLedger::default();
         ledger.record(event("1", true)).unwrap();
-        assert_eq!(ledger.record(event("1", true)), Err(TrustError::DuplicateEvent));
+        assert_eq!(
+            ledger.record(event("1", true)),
+            Err(TrustError::DuplicateEvent)
+        );
     }
 
     #[test]
